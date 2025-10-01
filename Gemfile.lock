@@ -1,0 +1,20 @@
+PATH
+  remote: .
+  specs:
+    gem-why (0.0.1)
+      rainbow (~> 3.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rainbow (3.1.1)
+
+PLATFORMS
+  arm64-darwin-25
+  ruby
+
+DEPENDENCIES
+  gem-why!
+
+BUNDLED WITH
+   2.7.2
