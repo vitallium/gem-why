@@ -53,6 +53,8 @@ To see which gems depend on a specific gem:
 gem why GEMNAME [options]
 ```
 
+**Bonus:** If you add this gem to your project, you can use the `bundle exec gem why` command to understand the dependencies of your gems in your project.
+
 ### Examples
 
 #### Default Behavior - Deep Dependencies
