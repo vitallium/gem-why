@@ -130,6 +130,7 @@ No gems depend on nonexistent-gem
 | (none) | | Show full dependency chains (default) |
 | `--direct` | `-d` | Show only direct dependencies |
 | `--tree` | `-t` | Display as a visual tree |
+| `--json` |  | Output in JSON format |
 | `--help` | `-h` | Show help message |
 | `--verbose` | `-V` | Verbose output |
 
