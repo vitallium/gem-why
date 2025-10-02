@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - "3.4.6"
+          - '3.4.6'
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,5 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Install Ruby gems
-        run: bundle install --deployment
       - name: Run the default task
         run: bundle exec rake
