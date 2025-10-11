@@ -16,9 +16,7 @@ module GemWhy
 
       Gem::Specification.each do |spec|
         spec.runtime_dependencies.each do |dep|
-          if dep.name.downcase == normalized_target
-            dependents << [spec.name, spec.version.to_s, dep.requirement.to_s]
-          end
+          dependents << [spec.name, spec.version.to_s, dep.requirement.to_s] if dep.name.downcase == normalized_target
         end
       end
 
@@ -71,7 +69,7 @@ module GemWhy
     end
 
     def process_dependency(dep, target_gem, path, new_node, visited)
-      if dep.name.downcase == target_gem.downcase
+      if dep.name.downcase == target_gem
         [path + [new_node]]
       else
         find_paths_to_target(dep.name, target_gem, path + [new_node], visited)
