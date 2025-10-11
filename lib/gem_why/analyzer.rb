@@ -3,6 +3,10 @@
 module GemWhy
   # Analyzes gem dependencies to find dependents and dependency chains
   class Analyzer
+    def initialize
+      @spec_cache = {}
+    end
+
     # Finds all gems that directly depend on the target gem
     # @param target_gem_name [String] the gem to find dependents for
     # @return [Array<Array(String, String)>] array of [gem_name, requirement] pairs
@@ -73,9 +77,11 @@ module GemWhy
     end
 
     def load_gem_spec(gem_name)
-      Gem::Specification.find_by_name(gem_name)
-    rescue Gem::MissingSpecError
-      nil
+      @spec_cache.fetch(gem_name) do
+        @spec_cache[gem_name] = Gem::Specification.find_by_name(gem_name)
+      rescue Gem::MissingSpecError
+        @spec_cache[gem_name] = nil
+      end
     end
 
     def build_dependency_node(spec, dep)
