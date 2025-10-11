@@ -14,7 +14,7 @@ module GemWhy
     # @return [Array<Dependent>] array of Dependent objects
     def find_direct_dependents(target_gem_name)
       Gem::Specification
-        .map(&:runtime_dependencies).flatten
+        .map(&:dependencies).flatten
         .filter { |dep| dep.name.downcase == target_gem_name.downcase }
         .map do |dep|
         Dependent.new(
@@ -62,7 +62,7 @@ module GemWhy
     def collect_dependency_paths(spec, target_gem, path, visited)
       paths = []
 
-      spec.runtime_dependencies.each do |dep|
+      spec.dependencies.each do |dep|
         new_node = build_dependency_node(spec, dep)
         paths.concat(process_dependency(dep, target_gem, path, new_node, visited))
       end
