@@ -14,15 +14,13 @@ module GemWhy
 
     # Outputs direct dependencies as JSON
     # @param gem_name [String] the target gem name
-    # @param dependents [Array<Array(String, String)>] the dependent gems
+    # @param dependents [Array<Array(String, String, String)>] the dependent gems
     # @return [void]
     def output_direct(gem_name, dependents)
       target = gem_name
       mode = "direct"
       total = dependents.size
-      dependents_data = dependents.map do |name, requirement|
-        spec = Gem::Specification.find_by_name(name)
-        version = spec.version.to_s
+      dependents_data = dependents.map do |name, version, requirement|
         { name:, version:, requirement: }
       end
       output = { target:, mode:, dependents: dependents_data, total: }

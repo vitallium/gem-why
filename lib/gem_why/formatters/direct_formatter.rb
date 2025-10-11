@@ -21,9 +21,8 @@ module GemWhy
       private
 
       def print_direct_dependents(dependents, gem_name)
-        dependents.each do |dependent_name, requirement|
-          spec = Gem::Specification.find_by_name(dependent_name)
-          say "  #{colorize(dependent_name, :blue)} (#{spec.version}) requires #{gem_name} #{requirement}"
+        dependents.each do |dependent_name, version, requirement|
+          say "  #{colorize(dependent_name, :blue)} (#{version}) requires #{gem_name} #{requirement}"
         end
       end
     end

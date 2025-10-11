@@ -9,14 +9,16 @@ module GemWhy
 
     # Finds all gems that directly depend on the target gem
     # @param target_gem_name [String] the gem to find dependents for
-    # @return [Array<Array(String, String)>] array of [gem_name, requirement] pairs
+    # @return [Array<Array(String, String, String)>] array of [gem_name, version, requirement] tuples
     def find_direct_dependents(target_gem_name)
       dependents = []
       normalized_target = target_gem_name.downcase
 
       Gem::Specification.each do |spec|
         spec.dependencies.each do |dep|
-          dependents << [spec.name, dep.requirement.to_s] if dep.name.downcase == normalized_target
+          if dep.name.downcase == normalized_target
+            dependents << [spec.name, spec.version.to_s, dep.requirement.to_s]
+          end
         end
       end
 
