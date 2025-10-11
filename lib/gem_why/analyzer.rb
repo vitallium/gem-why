@@ -15,7 +15,7 @@ module GemWhy
       normalized_target = target_gem_name.downcase
 
       Gem::Specification.each do |spec|
-        spec.dependencies.each do |dep|
+        spec.runtime_dependencies.each do |dep|
           if dep.name.downcase == normalized_target
             dependents << [spec.name, spec.version.to_s, dep.requirement.to_s]
           end
@@ -62,7 +62,7 @@ module GemWhy
     def collect_dependency_paths(spec, target_gem, path, visited)
       paths = []
 
-      spec.dependencies.each do |dep|
+      spec.runtime_dependencies.each do |dep|
         new_node = build_dependency_node(spec, dep)
         paths.concat(process_dependency(dep, target_gem, path, new_node, visited))
       end
