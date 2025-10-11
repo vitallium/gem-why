@@ -8,7 +8,7 @@ module GemWhy
     class DirectFormatter < BaseFormatter
       # Formats and displays direct dependencies
       # @param gem_name [String] the target gem name
-      # @param dependents [Array<Array(String, String)>] the dependent gems
+      # @param dependents [Array<Dependent>] the dependent gems
       # @return [void]
       def format(gem_name, dependents)
         return say "No gems depend on #{colorize(gem_name, :yellow)}" if dependents.empty?
@@ -21,8 +21,9 @@ module GemWhy
       private
 
       def print_direct_dependents(dependents, gem_name)
-        dependents.each do |dependent_name, version, requirement|
-          say "  #{colorize(dependent_name, :blue)} (#{version}) requires #{gem_name} #{requirement}"
+        dependents.each do |dependent|
+          say "  #{colorize(dependent.name,
+                            :blue)} (#{dependent.version}) requires #{gem_name} #{dependent.requirement}"
         end
       end
     end

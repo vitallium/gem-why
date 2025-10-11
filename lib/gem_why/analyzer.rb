@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "dependent"
+
 module GemWhy
   # Analyzes gem dependencies to find dependents and dependency chains
   class Analyzer
@@ -9,18 +11,18 @@ module GemWhy
 
     # Finds all gems that directly depend on the target gem
     # @param target_gem_name [String] the gem to find dependents for
-    # @return [Array<Array(String, String, String)>] array of [gem_name, version, requirement] tuples
+    # @return [Array<Dependent>] array of Dependent objects
     def find_direct_dependents(target_gem_name)
-      dependents = []
-      normalized_target = target_gem_name.downcase
-
-      Gem::Specification.each do |spec|
-        spec.runtime_dependencies.each do |dep|
-          dependents << [spec.name, spec.version.to_s, dep.requirement.to_s] if dep.name.downcase == normalized_target
-        end
-      end
-
-      dependents.sort_by(&:first)
+      Gem::Specification
+        .map(&:runtime_dependencies).flatten
+        .filter { |dep| dep.name.downcase == target_gem_name.downcase }
+        .map do |dep|
+        Dependent.new(
+          name: spec.name,
+          version: spec.version.to_s,
+          requirement: dep.requirement.to_s
+        )
+      end.sort_by(&:name)
     end
 
     # Finds all dependency chains leading to the target gem
