@@ -14,8 +14,8 @@ module Gem
     # Command to show which gems depend on a specific gem
     #
     # This command helps identify dependency relationships by showing:
-    # - Direct dependencies (--direct): immediate dependents only
-    # - Deep dependencies (default): full dependency chains
+    # - Direct dependents (--direct): immediate dependents only
+    # - Deep dependency chains (default): full dependency chains
     # - Tree visualization (--tree): hierarchical view
     #
     # @example Show all dependency chains
@@ -73,7 +73,7 @@ module Gem
       end
 
       def setup_direct_option
-        add_option("-d", "--direct", "Show only direct dependencies") do |value, options|
+        add_option("-d", "--direct", "Show only direct dependents") do |value, options|
           options[:direct] = value
         end
       end
@@ -130,7 +130,7 @@ module Gem
         end
       end
 
-      # Shows direct dependencies only
+      # Shows direct dependents only
       # @param gem_name [String] the target gem name
       # @return [void]
       def show_direct_dependencies(gem_name)
