@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
-    date (3.5.0)
+    date (3.5.1)
     erb (6.0.0)
     io-console (0.8.1)
     irb (1.15.3)
