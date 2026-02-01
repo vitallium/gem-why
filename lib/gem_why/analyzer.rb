@@ -17,11 +17,11 @@ module GemWhy
         .map(&:dependencies).flatten
         .filter { |dep| dep.name.downcase == target_gem_name.downcase }
         .map do |dep|
-          Dependent.new(
-            name: spec.name,
-            version: spec.version.to_s,
-            requirement: dep.requirement.to_s
-          )
+        Dependent.new(
+          name: spec.name,
+          version: spec.version.to_s,
+          requirement: dep.requirement.to_s
+        )
       end.sort_by(&:name)
     end
 
