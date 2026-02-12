@@ -15,5 +15,6 @@ group :development do
 end
 
 group :test do
+  gem "mocha"
   gem "simplecov", require: false
 end

@@ -11,15 +11,15 @@ class TestAnalyzer < Minitest::Test
   def test_find_direct_dependents_uses_runtime_dependencies_and_sorts
     specs = direct_dependent_specs
 
-    with_specification_stubs(each_specs: specs, lookup_specs: specs_by_name(specs)) do
-      assert_expected_direct_dependents(@analyzer.find_direct_dependents("target"))
-    end
+    Gem::Specification.expects(:flat_map).returns(specs.flat_map(&method(:direct_dependents_from_spec)))
+
+    assert_expected_direct_dependents(@analyzer.find_direct_dependents("target"))
   end
 
   def test_find_dependency_chains_returns_unique_sorted_chains
     each_specs, lookup_specs = chain_specs
 
-    with_specification_stubs(each_specs:, lookup_specs:) do
+    stub_gem_specification_methods(each_specs: each_specs, lookup_specs: lookup_specs) do
       assert_expected_dependency_chains(@analyzer.find_dependency_chains("TARGET"))
     end
   end
@@ -27,7 +27,7 @@ class TestAnalyzer < Minitest::Test
   def test_find_dependency_chains_handles_cycles_and_missing_specs
     each_specs, lookup_specs = cyclic_and_missing_specs
 
-    with_specification_stubs(each_specs:, lookup_specs:) do
+    stub_gem_specification_methods(each_specs: each_specs, lookup_specs: lookup_specs) do
       assert_empty @analyzer.find_dependency_chains("target")
     end
   end
@@ -76,47 +76,42 @@ class TestAnalyzer < Minitest::Test
     [each_specs, lookup_specs]
   end
 
-  def specs_by_name(specs)
-    specs.to_h { |single_spec| [single_spec.name, single_spec] }
-  end
-
   def spec(name, version, runtime:, deps:)
-    Struct.new(:name, :version, :runtime_dependencies, :dependencies, keyword_init: true)
-          .new(name:, version: Gem::Version.new(version), runtime_dependencies: runtime, dependencies: deps)
+    spec = mock("gem_spec_#{name}")
+    spec.stubs(:name).returns(name)
+    spec.stubs(:version).returns(Gem::Version.new(version))
+    spec.stubs(:runtime_dependencies).returns(runtime)
+    spec.stubs(:dependencies).returns(deps)
+    spec
   end
 
   def dep(name, requirement)
     Gem::Dependency.new(name, requirement)
   end
 
-  def with_specification_stubs(each_specs:, lookup_specs:)
-    spec_singleton = Gem::Specification.singleton_class
-    originals = specification_originals(spec_singleton)
-    apply_specification_stubs(spec_singleton, each_specs, lookup_specs)
+  def direct_dependents_from_spec(spec)
+    spec.runtime_dependencies
+        .filter { |dep| dep.name.downcase == "target" }
+        .map { |dep| GemWhy::Dependent.new(name: spec.name, version: spec.version.to_s, requirement: dep.requirement.to_s) }
+  end
+
+  def stub_gem_specification_methods(each_specs:, lookup_specs:)
+    Gem::Specification.expects(:each).multiple_yields(*each_specs)
+
+    # Target gem is never loaded since matching stops at the dependency
+    lookup_specs.each do |name, spec|
+      next if name == "target"
+
+      Gem::Specification.expects(:find_by_name).with(name).returns(spec).at_least_once
+    end
+
+    stub_missing_spec if lookup_specs.key?("missing_root")
     yield
-  ensure
-    restore_specification_methods(spec_singleton, originals)
   end
 
-  def specification_originals(spec_singleton)
-    {
-      flat_map: spec_singleton.instance_method(:flat_map),
-      each: spec_singleton.instance_method(:each),
-      find_by_name: spec_singleton.instance_method(:find_by_name)
-    }
-  end
-
-  def apply_specification_stubs(spec_singleton, each_specs, lookup_specs)
-    spec_singleton.send(:define_method, :flat_map) { |&block| each_specs.flat_map(&block) }
-    spec_singleton.send(:define_method, :each) { |&block| each_specs.each(&block) }
-    spec_singleton.send(:define_method, :find_by_name) do |name|
-      lookup_specs.fetch(name) { raise Gem::MissingSpecError.new(name, nil) }
-    end
-  end
-
-  def restore_specification_methods(spec_singleton, originals)
-    originals.each do |method_name, original_method|
-      spec_singleton.send(:define_method, method_name, original_method)
-    end
+  def stub_missing_spec
+    Gem::Specification.expects(:find_by_name).with("ghost").raises(
+      Gem::MissingSpecError.new("ghost", nil)
+    ).at_most_once
   end
 end
