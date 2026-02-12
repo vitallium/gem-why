@@ -13,3 +13,7 @@ group :development do
   gem "rubocop-rake"
   gem "yard"
 end
+
+group :test do
+  gem "simplecov", require: false
+end
