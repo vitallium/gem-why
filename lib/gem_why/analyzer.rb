@@ -13,15 +13,8 @@ module GemWhy
     # @param target_gem_name [String] the gem to find dependents for
     # @return [Array<Dependent>] array of Dependent objects
     def find_direct_dependents(target_gem_name)
-      Gem::Specification
-        .map(&:dependencies).flatten
-        .filter { |dep| dep.name.downcase == target_gem_name.downcase }
-        .map do |dep|
-        Dependent.new(
-          name: spec.name,
-          version: spec.version.to_s,
-          requirement: dep.requirement.to_s
-        )
+      Gem::Specification.flat_map do |spec|
+        direct_dependents_for_spec(spec, target_gem_name)
       end.sort_by(&:name)
     end
 
@@ -92,6 +85,14 @@ module GemWhy
       dependency = dep.name
       requirement = dep.requirement.to_s
       { name:, version:, dependency:, requirement: }
+    end
+
+    def direct_dependents_for_spec(spec, target_gem_name)
+      spec.runtime_dependencies
+          .filter { |dep| dep.name.downcase == target_gem_name.downcase }
+          .map do |dep|
+            Dependent.new(name: spec.name, version: spec.version.to_s, requirement: dep.requirement.to_s)
+          end
     end
   end
 end
