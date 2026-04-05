@@ -35,5 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RuboCop compliance with default settings
 - Complete documentation in README
 
+[0.0.3]: https://github.com/vitallium/gem-why/releases/tag/v0.0.3
 [0.0.2]: https://github.com/vitallium/gem-why/releases/tag/v0.0.2
 [0.0.1]: https://github.com/vitallium/gem-why/releases/tag/v0.0.1
