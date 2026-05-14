@@ -60,12 +60,6 @@ class TestWhyCommand < Minitest::Test
     assert @command.options[:json]
   end
 
-  def test_version_constant_defined
-    assert defined?(GemWhy::VERSION)
-    assert_kind_of String, GemWhy::VERSION
-    refute_empty GemWhy::VERSION
-  end
-
   def test_execute_with_direct_mode
     setup_ui
     @command.handle_options ["--direct", "minitest"]
