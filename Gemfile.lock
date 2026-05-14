@@ -11,7 +11,7 @@ GEM
     date (3.5.1)
     docile (1.4.1)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     io-console (0.8.2)
     irb (1.17.0)
       pp (>= 0.6.0)
