@@ -88,7 +88,7 @@ module GemWhy
     end
 
     def direct_dependents_for_spec(spec, target_gem_name)
-      spec.runtime_dependencies
+      spec.dependencies
           .filter { |dep| dep.name.downcase == target_gem_name.downcase }
           .map do |dep|
             Dependent.new(name: spec.name, version: spec.version.to_s, requirement: dep.requirement.to_s)

@@ -32,6 +32,17 @@ class TestAnalyzer < Minitest::Test
     end
   end
 
+  def test_find_direct_dependents_includes_development_dependencies
+    specs = dev_dependent_specs
+
+    Gem::Specification.expects(:flat_map).returns(specs.flat_map(&method(:direct_dependents_from_spec)))
+
+    dependents = @analyzer.find_direct_dependents("target")
+
+    assert_equal %w[alpha beta], dependents.map(&:name).sort
+    assert_equal %w[1.0 2.0], dependents.map(&:version).sort
+  end
+
   private
 
   def assert_expected_direct_dependents(dependents)
@@ -50,9 +61,16 @@ class TestAnalyzer < Minitest::Test
 
   def direct_dependent_specs
     [
-      spec("zeta", "1.0", runtime: [dep("target", ">= 1.0")], deps: [dep("target", "= 9.9")]),
-      spec("alpha", "2.0", runtime: [dep("TARGET", "~> 3.0")], deps: []),
-      spec("ignored", "3.0", runtime: [], deps: [dep("target", "= 1.0")])
+      spec("zeta", "1.0", runtime: [dep("target", ">= 1.0")], deps: [dep("target", ">= 1.0")]),
+      spec("alpha", "2.0", runtime: [dep("TARGET", "~> 3.0")], deps: [dep("TARGET", "~> 3.0")])
+    ]
+  end
+
+  def dev_dependent_specs
+    # Specs where target is a development dependency, not a runtime dependency
+    [
+      spec("alpha", "1.0", runtime: [], deps: [dep("target", ">= 1.0")]),
+      spec("beta", "2.0", runtime: [], deps: [dep("target", "~> 2.0")])
     ]
   end
 
@@ -90,7 +108,7 @@ class TestAnalyzer < Minitest::Test
   end
 
   def direct_dependents_from_spec(spec)
-    spec.runtime_dependencies
+    spec.dependencies
         .filter { |dep| dep.name.downcase == "target" }
         .map { |dep| GemWhy::Dependent.new(name: spec.name, version: spec.version.to_s, requirement: dep.requirement.to_s) }
   end
