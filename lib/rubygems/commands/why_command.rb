@@ -29,6 +29,7 @@ module Gem
     #
     # @example Output as JSON
     #   gem why rake --json
+    # rubocop:disable Metrics/ClassLength
     class WhyCommand < Gem::Command
       # Initializes the why command with options
       def initialize
@@ -173,5 +174,6 @@ module Gem
         end
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end
