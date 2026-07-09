@@ -50,6 +50,11 @@ module Gem
       # Executes the command with the provided arguments
       # @return [void]
       def execute
+        if options[:version]
+          say "gem-why version #{GemWhy::VERSION}"
+          terminate_interaction
+        end
+
         gem_name = validate_gem_name
         route_to_display_mode(gem_name)
       end
@@ -79,9 +84,8 @@ module Gem
       end
 
       def setup_version_option
-        add_option("-v", "--version", "Show gem-why version") do |_value, _options|
-          say "gem-why version #{GemWhy::VERSION}"
-          terminate_interaction
+        add_option("-v", "--version", "Show gem-why version") do |value, options|
+          options[:version] = value
         end
       end
 

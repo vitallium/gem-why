@@ -121,7 +121,9 @@ class TestWhyCommand < Minitest::Test
     @command.handle_options ["--version"]
 
     Gem::DefaultUserInteraction.use_ui(@ui) do
-      @command.execute
+      assert_raises Gem::SystemExitException do
+        @command.execute
+      end
     end
 
     assert_includes @output.string, GemWhy::VERSION
@@ -242,7 +244,7 @@ class TestWhyCommand < Minitest::Test
 
     data = JSON.parse(@output.string)
     assert_kind_of Array, data["chains"]
-    
+
     data["chains"].each do |chain|
       assert_kind_of Array, chain
       chain.each do |node|
@@ -266,7 +268,7 @@ class TestWhyCommand < Minitest::Test
     assert_equal "direct", data["mode"]
     assert data.key?("dependents")
     assert data.key?("total")
-    
+
     data["dependents"].each do |dep|
       assert dep.key?("name")
       assert dep.key?("version")
@@ -286,7 +288,7 @@ class TestWhyCommand < Minitest::Test
     assert_equal "tree", data["mode"]
     assert data.key?("roots")
     assert data.key?("total_roots")
-    
+
     data["roots"].each do |root|
       assert root.key?("name")
       assert root.key?("version")
