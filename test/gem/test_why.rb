@@ -5,6 +5,7 @@ require "rubygems/commands/why_command"
 require "stringio"
 require "json"
 
+# rubocop:disable Metrics/ClassLength
 class TestWhyCommand < Minitest::Test
   def setup
     @command = Gem::Commands::WhyCommand.new
@@ -121,7 +122,9 @@ class TestWhyCommand < Minitest::Test
     @command.handle_options ["--version"]
 
     Gem::DefaultUserInteraction.use_ui(@ui) do
-      @command.execute
+      assert_raises Gem::SystemExitException do
+        @command.execute
+      end
     end
 
     assert_includes @output.string, GemWhy::VERSION
@@ -232,6 +235,7 @@ class TestWhyCommand < Minitest::Test
     assert data.key?("total_chains")
   end
 
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def test_json_deep_mode_chain_structure
     setup_ui
     @command.handle_options ["--json", "rainbow"]
@@ -242,7 +246,7 @@ class TestWhyCommand < Minitest::Test
 
     data = JSON.parse(@output.string)
     assert_kind_of Array, data["chains"]
-    
+
     data["chains"].each do |chain|
       assert_kind_of Array, chain
       chain.each do |node|
@@ -253,7 +257,9 @@ class TestWhyCommand < Minitest::Test
       end
     end
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def test_json_direct_mode_returns_valid_json
     setup_ui
     @command.handle_options ["--json", "--direct", "rainbow"]
@@ -266,14 +272,16 @@ class TestWhyCommand < Minitest::Test
     assert_equal "direct", data["mode"]
     assert data.key?("dependents")
     assert data.key?("total")
-    
+
     data["dependents"].each do |dep|
       assert dep.key?("name")
       assert dep.key?("version")
       assert dep.key?("requirement")
     end
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def test_json_tree_mode_returns_valid_json
     setup_ui
     @command.handle_options ["--json", "--tree", "rainbow"]
@@ -286,13 +294,14 @@ class TestWhyCommand < Minitest::Test
     assert_equal "tree", data["mode"]
     assert data.key?("roots")
     assert data.key?("total_roots")
-    
+
     data["roots"].each do |root|
       assert root.key?("name")
       assert root.key?("version")
       assert root.key?("tree")
     end
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   def test_search_for_prism_finds_dependents
     setup_ui
@@ -316,6 +325,7 @@ class TestWhyCommand < Minitest::Test
     assert_includes @output.string, "Dependency chains leading to pp"
   end
 
+  # rubocop:disable Metrics/MethodLength
   def test_deep_and_direct_modes_both_find_dependencies
     setup_ui
     @command.handle_options ["rainbow"]
@@ -337,6 +347,7 @@ class TestWhyCommand < Minitest::Test
     assert_includes deep_result, "rainbow"
     assert_includes direct_result, "rainbow"
   end
+  # rubocop:enable Metrics/MethodLength
 
   def test_tree_mode_includes_all_information_from_deep_mode
     setup_ui
@@ -367,3 +378,4 @@ class TestWhyCommand < Minitest::Test
     @ui = Gem::StreamUI.new(StringIO.new, @output, @output)
   end
 end
+# rubocop:enable Metrics/ClassLength
