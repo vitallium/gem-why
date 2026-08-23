@@ -17,7 +17,9 @@ module GemWhy
       # Determines if output should be colorized
       # @return [Boolean] true if colors should be used
       def colorize?
-        !command.options[:no_color] && $stdout.tty?
+        return false if command.options[:no_color]
+
+        command.ui.outs.tty?
       end
 
       # Colorizes text if appropriate
